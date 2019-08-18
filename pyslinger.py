@@ -147,6 +147,8 @@ class RC5():
                 self.zero()
             elif i == "1":
                 self.one()
+            elif i == "x":
+                self.space()
             else:
                 print("ERROR! Non-binary digit!")
                 return 1
@@ -163,54 +165,8 @@ class RC5():
         self.wave_generator.zero(self.one_duration)
         self.wave_generator.one(self.one_duration)
 
-
-# RC-5 protocol class
-# Note: start bits are not implemented here due to inconsistency between manufacturers.
-# Simply provide them with the rest of the IR code.
-class RC5X():
-    def __init__(self,
-                master,
-                frequency=36000,
-                duty_cycle=0.33,
-                one_duration=889,
-                zero_duration=889):
-        self.master = master
-        self.wave_generator = Wave_generator(self)
-        self.frequency = frequency # in Hz, 36000 per specification
-        self.duty_cycle = duty_cycle # duty cycle of high state pulse
-        # Durations of high pulse and low "gap".
-        # Technically, they both should be the same in the RC-5 protocol, but we can never expect
-        # that any given TV will follow the protocol specification.
-        self.one_duration = one_duration # in microseconds, 889 per specification
-        self.zero_duration = zero_duration # in microseconds, 889 per specification
-        print("RC-5 protocol initialized")
-
-    # This function is processing IR code. Leaves room for possible manipulation
-    # of the code before processing it.
-    def process_code(self, ircode):
-        for i in ircode:
-            if i == "0":
-                self.zero()
-            elif i == "1":
-                self.one()
-            else:
-                print("ERROR! Non-binary digit!")
-                return 1
-        return 0
-
-    # Generate zero or one in RC-5 protocol
-    # Zero is represented by pulse-then-low signal
-    def zero(self):
-        self.wave_generator.one(self.zero_duration)
-        self.wave_generator.zero(self.zero_duration)
-
-    # One is represented by low-then-pulse signal
-    def one(self):
-        self.wave_generator.zero(self.one_duration)
-        self.wave_generator.one(self.one_duration)
-
-
-
+    def space(self):
+        self.wave_generator.zero(4*self.zero_duration)
 
 
 # RAW IR ones and zeroes. Specify length for one and zero and simply bitbang the GPIO.
@@ -329,6 +285,7 @@ if __name__ == "__main__":
     codes["TUNER"] = "11010001111111"
     codes["PHONO"] = "11010101111111"
     codes["RECORDER"] = "11011010111111"
+    codes["COAX"] = "11110000x000001011001"
 
 
 
