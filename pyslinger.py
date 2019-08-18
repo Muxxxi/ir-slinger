@@ -278,7 +278,9 @@ if __name__ == "__main__":
     codes["CD"] =    "11010100111111"
     codes["TUNER"] = "11010001111111"
     codes["PHONO"] = "11010101111111"
+    code ["RECORDER"] = "11011010111111"
 
+    
 
     protocol = "RC-5"
     gpio_pin = 4
