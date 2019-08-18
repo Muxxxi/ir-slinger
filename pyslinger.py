@@ -275,7 +275,7 @@ if __name__ == "__main__":
     codes["A/B"] = "11010000011101"
     codes["DIRECT"] = "11010000100010"
     codes["LOUDNESS"] = "11010000110010"
-    codes["CD"] = "11010100111111"
+    codes["CD"] = "11010000111111"
 
     protocol = "RC-5"
     gpio_pin = 4
