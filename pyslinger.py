@@ -6,6 +6,7 @@
 
 import ctypes
 import time
+import sys
 
 # This is the struct required by pigpio library.
 # We store the individual pulses and their duration here. (In an array of these structs.)
@@ -265,10 +266,20 @@ class IR():
 # Provide the IR code to the send_code() method.
 # An example is given below.
 if __name__ == "__main__":
+
+    codes = dict()
+    codes["POWER"] = "11010000001100"
+    codes["MUTE"] = "11010000001101"
+    codes["UP"] = "11010000010000"
+    codes["DOWN"] = "11010000010001"
+    codes["A/B"] = "11010000011101"
+    codes["DIRECT"] = "11010000100010"
+    codes["LOUDNESS"] = "11010000110010"
+    codes["CD"] = "11010100111111"
+
     protocol = "RC-5"
-    gpio_pin = 17
-    protocol_config = dict(one_duration = 820,
-                            zero_duration = 820)
+    gpio_pin = 4
+    protocol_config = dict()
     ir = IR(gpio_pin, protocol, protocol_config)
-    ir.send_code("11000000001100")
+    ir.send_code(codes[sys.argv[1]])
     print("Exiting IR")
