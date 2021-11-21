@@ -266,32 +266,3 @@ class IR():
         self.pigpio.gpioWaveDelete(wave_id)
         print("Terminating pigpio")
         self.pigpio.gpioTerminate()
-
-# Simply define the GPIO pin, protocol (NEC, RC-5 or RAW) and
-# override the protocol defaults with the dictionary if required.
-# Provide the IR code to the send_code() method.
-# An example is given below.
-if __name__ == "__main__":
-    codes = dict()
-    codes["stop"] = "11010000001100"
-    codes["start"] = "11010000001100x11010000001100"
-    codes["mute"] = "11010000001101"
-    codes["up"] = "11010000010000"
-    codes["down"] = "11010000010001"
-    codes["a/b"] = "11010000011101"
-    codes["direct"] = "11010000100010"
-    codes["loudness"] = "11010000110010"
-    codes["cd"] =    "11010100111111"
-    codes["tuner"] = "11010001111111"
-    codes["phono"] = "11010101111111"
-    codes["recorder"] = "11011010111111"
-    codes["coax"] = "11010000x000001011001"
-    codes["opt"] =  "11010000x000001101000"
-    codes["net"] =  "11011001x111111001010"
-
-    protocol = "RC-5"
-    gpio_pin = 4
-    protocol_config = dict()
-    ir = IR(gpio_pin, protocol, protocol_config)
-    ir.send_code(codes[sys.argv[1]])
-    print("Exiting IR")
