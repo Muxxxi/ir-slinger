@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pyslinger as irslinger
 import sys
 import asyncio
