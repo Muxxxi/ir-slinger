@@ -5,6 +5,7 @@ import sys
 import asyncio
 import os
 import re
+import signal
 import time
 
 from meross_iot.http_api import MerossHttpClient
@@ -21,6 +22,11 @@ pm6006 = {"off": "11010000001100", "on": "11010000001100x11010000001100",
 		  "direct": "11010000100010", "loudness": "11010000110010", "cd": "11010100111111", "tuner": "11010001111111",
 		  "phono": "11010101111111", "recorder": "11011010111111", "coax": "11010000x000001011001",
 		  "opt": "11010000x000001101000", "net": "11011001x111111001010"}
+
+
+def sigterm_handler(_signo, _stack_frame):
+	# Raises SystemExit(0):
+	sys.exit(0)
 
 
 def send_ir(code: str):
@@ -108,6 +114,7 @@ async def main():
 # override the protocol defaults with the dictionary if required.
 # Provide the IR code to the send_code() method.
 if __name__ == "__main__":
+	signal.signal(signal.SIGTERM, sigterm_handler)
 	if sys.argv[1] == "run":
 		loop = asyncio.get_event_loop()
 		loop.run_until_complete(main())
