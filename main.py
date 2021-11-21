@@ -67,49 +67,55 @@ def is_line_in_file():
 	file = open("/proc/asound/card1/pcm0p/sub0/status", "r")
 	for line in file:
 		if re.search("state: RUNNING", line):
-			print("ALSA plays sound")
 			return True
-	print("ALSA is not playing sound")
+	print("music paused")
 	return False
 
 
 async def main():
-	stopTime = None
-	isPlaying = False
 	manager, http_api_client, dev = await init_meross()
+	metrics = await dev.async_get_instant_metrics()
+	stop_time = None
+	is_playing = is_line_in_file()
+	amp_state = False if (metrics.power < 10.0) else True
 	try:
 		while True:
 			await asyncio.sleep(2)
 			if is_line_in_file():
-				if not isPlaying:
+				print("music playing")
+				if not is_playing:
 					print("playback started")
-					isPlaying = True
-					stopTime = None
+					is_playing = True
+					stop_time = None
 					metrics = await dev.async_get_instant_metrics()
 					if metrics.power < 10.0:
-						print("start receiver")
+						print("power on AMP")
 						send_ir("on")
 					else:
-						print("amp already started")
+						print("AMP already started")
+			elif amp_state is False:
 				continue
-			elif stopTime is None:
-				stopTime = time.time()
-				isPlaying = False
-			elif time.time() - stopTime > SHUTDOWN:
-				stopTime = None
-				isPlaying = False
+			elif stop_time is None:
+				print("music paused init shutdown counter")
+				stop_time = time.time()
+				is_playing = False
+			elif time.time() - stop_time > SHUTDOWN:
+				print("timeout reached power off AMP")
+				stop_time = None
+				is_playing = False
+				amp_state = False
 				metrics = await dev.async_get_instant_metrics()
 				if metrics.power > 10.0:
-					print("shutdown amp")
 					send_ir("off")
 				else:
-					print("amp already off")
+					print("AMP already off")
 			else:
-				shutdown = SHUTDOWN - (time.time() - stopTime)
+				shutdown = round(SHUTDOWN - (time.time() - stop_time))
 				print("Time until shutdown: " + str(shutdown))
-				isPlaying = False
+				is_playing = False
 
 	finally:
+		print("shutdown meross connection")
 		manager.close()
 		await http_api_client.async_logout()
 
