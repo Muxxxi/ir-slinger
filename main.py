@@ -5,6 +5,7 @@ import sys
 import asyncio
 import os
 import re
+import time
 
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
@@ -12,9 +13,10 @@ from meross_iot.manager import MerossManager
 EMAIL = os.environ.get('MEROSS_EMAIL') or "YOUR_MEROSS_CLOUD_EMAIL"
 PASSWORD = os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_PASSWORD"
 
+SHUTDOWN = 60
 GPIO_PIN = 24
 PROTOCOL = "RC-5"
-pm6006 = {"stop": "11010000001100", "start": "11010000001100x11010000001100",
+pm6006 = {"off": "11010000001100", "on": "11010000001100x11010000001100",
 		  "mute": "11010000001101", "up": "11010000010000", "down": "11010000010001", "output": "11010000011101",
 		  "direct": "11010000100010", "loudness": "11010000110010", "cd": "11010100111111", "tuner": "11010001111111",
 		  "phono": "11010101111111", "recorder": "11011010111111", "coax": "11010000x000001011001",
@@ -66,6 +68,7 @@ def is_line_in_file():
 
 
 async def main():
+	stopTime = None
 	manager, http_api_client, dev = await init_meross()
 	try:
 		while True:
@@ -75,15 +78,26 @@ async def main():
 					print("playback started")
 					isPlaying = True
 					metrics = await dev.async_get_instant_metrics()
-					print(metrics)
 					if metrics.power < 10.0:
 						print("start receiver")
-						send_ir("start")
+						send_ir("on")
 					else:
 						print("amp already started")
 				continue
-
-			isPlaying = False
+			elif isPlaying:
+				stopTime = time.time()
+				isPlaying = False
+			elif time.time() - stopTime > SHUTDOWN:
+				stopTime = 0
+				isPlaying = False
+				metrics = await dev.async_get_instant_metrics()
+				if metrics.power > 10.0:
+					print("shutdown receiver")
+					send_ir("off")
+				else:
+					print("amp already off")
+			else:
+				isPlaying = False
 
 	finally:
 		manager.close()
