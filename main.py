@@ -68,7 +68,6 @@ def is_line_in_file():
 	for line in file:
 		if re.search("state: RUNNING", line):
 			return True
-	print("music paused")
 	return False
 
 
@@ -82,25 +81,24 @@ async def main():
 		while True:
 			await asyncio.sleep(2)
 			if is_line_in_file():
-				print("music playing")
 				if not is_playing:
-					print("playback started")
+					print("Playback started")
 					is_playing = True
 					stop_time = None
 					metrics = await dev.async_get_instant_metrics()
 					if metrics.power < 10.0:
-						print("power on AMP")
+						print("Power on AMP")
 						send_ir("on")
 					else:
 						print("AMP already started")
 			elif amp_state is False:
 				continue
 			elif stop_time is None:
-				print("music paused init shutdown counter")
+				print("Music paused init shutdown counter")
 				stop_time = time.time()
 				is_playing = False
 			elif time.time() - stop_time > SHUTDOWN:
-				print("timeout reached power off AMP")
+				print("Timeout reached power off AMP")
 				stop_time = None
 				is_playing = False
 				amp_state = False
@@ -111,7 +109,7 @@ async def main():
 					print("AMP already off")
 			else:
 				shutdown = round(SHUTDOWN - (time.time() - stop_time))
-				print("Time until shutdown: " + str(shutdown))
+				print("Music paused. Time until shutdown: " + str(shutdown))
 				is_playing = False
 
 	finally:
