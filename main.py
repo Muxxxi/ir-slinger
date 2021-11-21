@@ -99,11 +99,13 @@ async def main():
 				isPlaying = False
 				metrics = await dev.async_get_instant_metrics()
 				if metrics.power > 10.0:
-					print("shutdown receiver")
+					print("shutdown amp")
 					send_ir("off")
 				else:
 					print("amp already off")
 			else:
+				shutdown = SHUTDOWN - (time.time() - stopTime)
+				print("Time until shutdown: " + str(shutdown))
 				isPlaying = False
 
 	finally:
@@ -116,6 +118,7 @@ async def main():
 # Provide the IR code to the send_code() method.
 if __name__ == "__main__":
 	signal.signal(signal.SIGTERM, sigterm_handler)
+	signal.signal(signal.SIGINT, sigterm_handler)
 	if sys.argv[1] == "run":
 		loop = asyncio.get_event_loop()
 		loop.run_until_complete(main())
