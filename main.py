@@ -75,6 +75,7 @@ def is_line_in_file():
 
 async def main():
 	stopTime = None
+	isPlaying = False
 	manager, http_api_client, dev = await init_meross()
 	try:
 		while True:
