@@ -41,7 +41,6 @@ async def init_meross():
 	# Retrieve all the MSS310 devices that are registered on this account
 	await manager.async_device_discovery()
 	plugs = manager.find_devices(device_type="mss310")
-	print(plugs)
 
 	if len(plugs) < 1:
 		print("No MSS310 plugs found...")
@@ -51,6 +50,7 @@ async def init_meross():
 		dev = plugs[0]
 		# The first time we play with a device, we must update its status
 		await dev.async_update()
+		print(dev)
 
 		return manager, http_api_client, dev
 
@@ -59,7 +59,9 @@ def is_line_in_file():
 	file = open("/proc/asound/card1/pcm0p/sub0/status", "r")
 	for line in file:
 		if re.search("state: RUNNING", line):
+			print("ALSA plays sound")
 			return True
+	print("ALSA is not playing sound")
 	return False
 
 
@@ -67,9 +69,10 @@ async def main():
 	manager, http_api_client, dev = await init_meross()
 	try:
 		while True:
-			asyncio.sleep(2)
+			await asyncio.sleep(2)
 			if is_line_in_file():
 				if not isPlaying:
+					print("playback started")
 					isPlaying = True
 					metrics = await dev.async_get_instant_metrics()
 					print(metrics)
