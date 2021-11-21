@@ -84,6 +84,7 @@ async def main():
 				if not isPlaying:
 					print("playback started")
 					isPlaying = True
+					stopTime = None
 					metrics = await dev.async_get_instant_metrics()
 					if metrics.power < 10.0:
 						print("start receiver")
