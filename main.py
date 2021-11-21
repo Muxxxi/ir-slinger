@@ -24,7 +24,7 @@ pm6006 = {"stop": "11010000001100", "start": "11010000001100x11010000001100",
 def send_ir(code: str):
 	ir = irslinger.IR(GPIO_PIN, PROTOCOL, dict())
 	if pm6006.get(code):
-		ir.send_code(pm6006[sys.argv[1]])
+		ir.send_code(pm6006[code])
 	else:
 		print("Code not found")
 	print("Exiting IR")
@@ -89,10 +89,14 @@ async def main():
 		manager.close()
 		await http_api_client.async_logout()
 
+
 # Simply define the GPIO pin, protocol (NEC, RC-5 or RAW) and
 # override the protocol defaults with the dictionary if required.
 # Provide the IR code to the send_code() method.
 if __name__ == "__main__":
-	loop = asyncio.get_event_loop()
-	loop.run_until_complete(main())
-	loop.close()
+	if sys.argv[1] == "run":
+		loop = asyncio.get_event_loop()
+		loop.run_until_complete(main())
+		loop.close()
+	else:
+		send_ir(sys.argv[1])
