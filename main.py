@@ -91,10 +91,10 @@ async def main():
 					else:
 						print("amp already started")
 				continue
-			elif isPlaying:
+			elif stopTime is None:
 				stopTime = time.time()
 				isPlaying = False
-			elif stopTime is not None and time.time() - stopTime > SHUTDOWN:
+			elif time.time() - stopTime > SHUTDOWN:
 				stopTime = None
 				isPlaying = False
 				metrics = await dev.async_get_instant_metrics()
