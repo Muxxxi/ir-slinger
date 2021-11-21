@@ -74,7 +74,7 @@ def is_line_in_file():
 
 
 async def main():
-	stopTime = 0
+	stopTime = None
 	isPlaying = False
 	manager, http_api_client, dev = await init_meross()
 	try:
@@ -94,8 +94,8 @@ async def main():
 			elif isPlaying:
 				stopTime = time.time()
 				isPlaying = False
-			elif time.time() - stopTime > SHUTDOWN:
-				stopTime = 0
+			elif stopTime is not None and time.time() - stopTime > SHUTDOWN:
+				stopTime = None
 				isPlaying = False
 				metrics = await dev.async_get_instant_metrics()
 				if metrics.power > 10.0:
