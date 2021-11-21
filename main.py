@@ -14,7 +14,7 @@ from meross_iot.manager import MerossManager
 EMAIL = os.environ.get('MEROSS_EMAIL') or "YOUR_MEROSS_CLOUD_EMAIL"
 PASSWORD = os.environ.get('MEROSS_PASSWORD') or "YOUR_MEROSS_CLOUD_PASSWORD"
 
-SHUTDOWN = 60
+SHUTDOWN = 60*10
 GPIO_PIN = 24
 PROTOCOL = "RC-5"
 pm6006 = {"off": "11010000001100", "on": "11010000001100x11010000001100",
@@ -114,7 +114,7 @@ async def main():
 		await http_api_client.async_logout()
 
 
-# Simply define the GPIO pin, protocol (NEC, RC-5 or RAW) and
+# Simply define the GPIO pin, protreceiverocol (NEC, RC-5 or RAW) and
 # override the protocol defaults with the dictionary if required.
 # Provide the IR code to the send_code() method.
 if __name__ == "__main__":
