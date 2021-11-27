@@ -7,6 +7,10 @@ import os
 import re
 import signal
 import time
+import logging as log
+
+log.basicConfig(level=log.DEBUG)
+
 
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
@@ -34,8 +38,8 @@ def send_ir(code: str):
 	if pm6006.get(code):
 		ir.send_code(pm6006[code])
 	else:
-		print("Code not found")
-	print("Exiting IR")
+		log.info("Code not found")
+	log.info("Exiting IR")
 
 
 async def init_meross():
@@ -51,14 +55,14 @@ async def init_meross():
 	plugs = manager.find_devices(device_type="mss310")
 
 	if len(plugs) < 1:
-		print("No MSS310 plugs found...")
+		log.info("No MSS310 plugs found...")
 	else:
 		# Turn it on channel 0
 		# Note that channel argument is optional for MSS310 as they only have one channel
 		dev = plugs[0]
 		# The first time we play with a device, we must update its status
 		await dev.async_update()
-		print(dev)
+		log.info(dev)
 
 		return manager, http_api_client, dev
 
@@ -82,23 +86,23 @@ async def main():
 			await asyncio.sleep(2)
 			if is_line_in_file():
 				if not is_playing:
-					print("Playback started")
+					log.info("Playback started")
 					is_playing = True
 					stop_time = None
 					metrics = await dev.async_get_instant_metrics()
 					if metrics.power < 10.0:
-						print("Power on AMP")
+						log.info("Power on AMP")
 						send_ir("on")
 					else:
-						print("AMP already started")
+						log.info("AMP already started")
 			elif amp_state is False:
 				continue
 			elif stop_time is None:
-				print("Music paused init shutdown counter")
+				log.info("Music paused init shutdown counter")
 				stop_time = time.time()
 				is_playing = False
 			elif time.time() - stop_time > SHUTDOWN:
-				print("Timeout reached power off AMP")
+				log.info("Timeout reached power off AMP")
 				stop_time = None
 				is_playing = False
 				amp_state = False
@@ -106,14 +110,14 @@ async def main():
 				if metrics.power > 10.0:
 					send_ir("off")
 				else:
-					print("AMP already off")
+					log.info("AMP already off")
 			else:
 				shutdown = round(SHUTDOWN - (time.time() - stop_time))
-				print("Music paused. Time until shutdown: " + str(shutdown))
+				log.info("Music paused. Time until shutdown: " + str(shutdown))
 				is_playing = False
 
 	finally:
-		print("shutdown meross connection")
+		log.info("shutdown meross connection")
 		manager.close()
 		await http_api_client.async_logout()
 
