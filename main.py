@@ -90,6 +90,7 @@ async def main():
 				if is_playing is False:
 					log.info("Playback started")
 					is_playing = True
+					amp_state = True
 					stop_time = None
 					metrics = await dev.async_get_instant_metrics()
 					if metrics.power < 10.0:
