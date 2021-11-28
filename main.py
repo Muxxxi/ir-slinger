@@ -83,9 +83,11 @@ async def main():
 	amp_state = False if (metrics.power < 10.0) else True
 	try:
 		while True:
+			log.debug("Run Loop")
 			await asyncio.sleep(2)
 			if is_line_in_file():
-				if not is_playing:
+				log.debug("alsa playback is running")
+				if is_playing is False:
 					log.info("Playback started")
 					is_playing = True
 					stop_time = None
@@ -96,6 +98,7 @@ async def main():
 					else:
 						log.info("AMP already started")
 			elif amp_state is False:
+				log.debug("AMP is off")
 				continue
 			elif stop_time is None:
 				log.info("Music paused init shutdown counter")
