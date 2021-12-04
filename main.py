@@ -59,7 +59,11 @@ async def init_meross():
 	else:
 		# Turn it on channel 0
 		# Note that channel argument is optional for MSS310 as they only have one channel
-		dev = plugs[0]
+		dev = None
+		for d in plugs:
+			if d.name == "pm6006":
+				dev = d
+				break
 		# The first time we play with a device, we must update its status
 		await dev.async_update()
 		log.info(dev)
